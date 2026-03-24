@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!-- Use with Selenium Grid: one session per thread. If you see TestNG orchestrator NPEs, set retry.max.attempts=0 or run sequential smoke. -->
+<suite name="ParallelRegression" parallel="methods" thread-count="4" verbose="1">
+    <test name="internet-regression">
+        <groups>
+            <run>
+                <include name="regression"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.automation.tests.internet.TheInternetLoginTest"/>
+        </classes>
+    </test>
+</suite>

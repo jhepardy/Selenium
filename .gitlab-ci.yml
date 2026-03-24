@@ -1,0 +1,29 @@
+stages:
+  - test
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "-B --no-transfer-progress"
+  SELENIUM_GRID_URL: "http://selenium:4444/wd/hub"
+
+cache:
+  paths:
+    - .m2/repository
+
+ui_tests:
+  stage: test
+  image: maven:3.9-eclipse-temurin-17
+  services:
+    - name: selenium/standalone-chrome:latest
+      alias: selenium
+  script:
+    - mvn $MAVEN_CLI_OPTS clean test -Denv=staging -Dbrowser=chrome -Dheadless=true -DsuiteXmlFile=src/test/resources/suites/smoke.xml
+  artifacts:
+    when: always
+    paths:
+      - target/extent-report/
+      - screenshots/
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
