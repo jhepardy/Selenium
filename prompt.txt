@@ -1,0 +1,29 @@
+Here’s what was added under /Users/user/dev/projects/Selenium and how to use it.
+
+Layout
+Area	Path
+Maven + deps	pom.xml (Selenium 4, TestNG, WebDriverManager, RestAssured, Jackson, OpenCSV, POI, Log4j2, ExtentReports)
+Config	src/main/resources/config/{default,dev,staging,prod}.properties
+Logging	src/main/resources/log4j2.xml
+Test data	src/main/resources/testdata/users.json, users.csv
+Core	com.automation.config.EnvironmentConfig, driver.DriverFactory, core.BasePage, actions.ElementActions
+Support	BrowserWindowHelper, FrameHelper, ModalHelper, AlertHelper, FileTransferHelper, LocatorStrategies, ScreenshotHelper
+Data	JsonDataLoader, CsvDataLoader, ExcelDataLoader, JdbcCredentialsLoader
+API (hybrid)	com.automation.api.SampleApiClient
+POM	pages/internet/TheInternetLoginPage (targets the-internet.herokuapp.com/login)
+Tests	tests/base/AbstractWebTest, tests/internet/TheInternetLoginTest
+Listeners	RetryAnalyzer, RetryAnnotationTransformer (via META-INF/services/org.testng.IAnnotationTransformer), ScreenshotListener, ExtentTestListener
+Reporting	reporting/ExtentManager → target/extent-report/index.html
+Suites	suites/smoke.xml (parallel="none"), suites/parallel-regression.xml (parallel methods + regression)
+CI	.github/workflows/ui-tests.yml, .gitlab-ci.yml, Jenkinsfile
+Docs	README.md
+Behaviour notes
+Parallel + retry: With TestNG 7.10, parallel="methods" plus IRetryAnalyzer led to a GraphOrchestrator NPE. Default smoke suite is sequential (parallel="none"). Use parallel-regression.xml against Grid for parallel runs; if issues persist, set retry.max.attempts=0 in properties or upgrade TestNG when a fix is available.
+Env / CI: SELENIUM_GRID_URL and BROWSER are read from the environment before applying -D overrides (EnvironmentConfig).
+Jenkins: GRID_URL parameter maps to SELENIUM_GRID_URL for the Maven step (no credential binding required for a minimal example).
+Run
+cd /Users/user/dev/projects/Selenium
+mvn clean test -Denv=dev -Dheadless=true -Dbrowser=chrome
+Smoke suite is the default in pom.xml; mvn clean test already runs it. mvn clean test completed successfully here (3 smoke tests against Heroku’s demo app).
+
+Excel: ExcelDataLoader is ready; add a .xlsx under src/main/resources/testdata/ and a test DataProvider when you need it. JDBC: set jdbc.url / jdbc.user / jdbc.password and use JdbcCredentialsLoader.loadFromQuery(...) against a test database only.
